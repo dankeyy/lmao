@@ -11,7 +11,7 @@ let rec interpret expr =
   | Abstraction _ -> expr
 
   | Application (Abstraction (x, body), arg) ->
-      substitute x arg body (* this is the beta reduction entrypoint basically *)
+      interpret (substitute x arg body) (* this is the beta reduction entrypoint basically *)
 
   | Application (f, arg) ->
       let f' = interpret f in (* here we try to reduce *)
@@ -67,13 +67,17 @@ let rec show_lmao_expr = function
 let string_of_l_exp e = show_lmao_expr e
 
 
-let id = Abstraction ("x", Variable "x")
-
+(* let id = Abstraction ("x", Variable "x") *)
 (* if all goes well the this should reduce to id *)
-let test = Application (id, Abstraction ("y", Variable "y")) (* (λx.x)(λy.y) *)
+(* let test = Application (id, Abstraction ("y", Variable "y")) (\* (λx.x)(λy.y) *\) *)
+
+let true_  = Abstraction ("t", Abstraction ("f", Variable "t")) (* λt.λf.t *)
+let false_ = Abstraction ("t", Abstraction ("f", Variable "f")) (* λt.λf.f *)
+let and_ = Abstraction ("p", Abstraction ("q", Application (Application (Variable "p", Variable "q"), Variable "p")))
+let test2 = Application (Application (and_, true_), false_)
 
 let () =
-  Printf.printf "Result: %s\n" (string_of_l_exp (interpret test))
+  Printf.printf "Result: %s\n" (string_of_l_exp (interpret test2))
 
 (* let () = *)
 (*   let id = Abstraction ("x", Variable "x") in *)
