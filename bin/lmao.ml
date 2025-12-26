@@ -20,26 +20,26 @@ let rec interpret expr =
 
 and substitute target replacement body =
   match body with
-  | Variable v when v = target
-    -> replacement
+  | Variable v when v = target ->
+    replacement
 
-  | Variable v
-    -> Variable v
+  | Variable v ->
+    Variable v
 
   (* hopefully careful capture avoidance stuff *)
-  | Abstraction (bound, body_expr) when bound <> target && not (free_in bound replacement)
+  | Abstraction (bound, body_expr) when bound <> target && not (free_in bound replacement) ->
     (* if safe to recursively replace within the lambody: *)
-    -> Abstraction (bound, substitute target replacement body_expr)
+    Abstraction (bound, substitute target replacement body_expr)
 
   (* rename to avoid collisions *)
   | Abstraction (bound, body_expr) ->
-      let fresh = fresh_var bound [target; bound] in
-      let body_renamed = substitute bound (Variable fresh) body_expr in
-      Abstraction (fresh, substitute target replacement body_renamed)
+    let fresh = fresh_var bound [target; bound] in
+    let body_renamed = substitute bound (Variable fresh) body_expr in
+    Abstraction (fresh, substitute target replacement body_renamed)
 
   (* and application is easy because we can just recurse into both ends *)
   | Application (e1, e2) ->
-      Application (substitute target replacement e1, substitute target replacement e2)
+    Application (substitute target replacement e1, substitute target replacement e2)
 
 
 and fresh_var base used =
